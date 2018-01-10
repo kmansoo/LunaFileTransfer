@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ccCore/ccString.h"
-
 #include "ccWebsocketClient/ccEasyWebsocketClient.h"
 
 class FileSendingClient {

@@ -27,6 +27,7 @@ add_executable (LunaFileTransferServer
     LunaFileTransferServer.cpp
     FileReceiver.cpp
     FileSender.cpp
+		FileTransferSessionInfo.cpp
 )
 
 TARGET_LINK_LIBRARIES(LunaFileTransferServer

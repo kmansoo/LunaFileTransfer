@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "ccCore/ccString.h"
 #include "ccWebServer/ccWebsocket.h"
 
@@ -15,7 +17,6 @@ private:
                                 const std::string &message);
 
 private:
-  //Luna::ccEasyWebsocketClient ws_client_;
   std::shared_ptr<Luna::ccWebsocket> ws_client_;
   bool is_ws_closed_;
 };

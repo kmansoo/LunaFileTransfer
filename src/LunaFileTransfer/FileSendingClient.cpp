@@ -9,17 +9,11 @@
 #include "json/value.h"
 #include "json/writer.h"
 
-#include "ccWebServer/ccWebServerManager.h"
-#include "ccMongooseServer/ccMongooseWebServerObjectFactory.h"
-
 #include "FileSendingClient.h"
 
 #include "ccWebsocketClient/ccEasyWebsocketClient.h"
 
 FileSendingClient::FileSendingClient() : is_ws_closed_(true) {
-  Luna::ccWebServerManager::instance().attach_factory(std::make_shared<Luna::ccMongooseWebServerObjectFactory>());
-
-  // ws_client_ = Luna::ccWebServerManager::instance().create_websocket();
   ws_client_ = std::make_shared<Luna::ccEasyWebsocketClient>();
 
   ws_client_->set_event_listener(
@@ -105,7 +99,7 @@ bool FileSendingClient::send(const std::string &url,
         if (count_for_sleep++ > 5) {
           count_for_sleep = 0;
 
-          // `Luna::sleep(5);
+          //Luna::sleep(5);
         }
 
         sent_bytes += read_bytes;
@@ -113,7 +107,7 @@ bool FileSendingClient::send(const std::string &url,
         std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
         std::cout << sent_bytes << " / " << filesize << "(" << (float)sent_bytes / (float)filesize * 100.0f << "%)";
         
-        Luna::sleep(1);
+        Luna::sleep(3);
     }
 
     protocol_json.clear();

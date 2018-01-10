@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ccCore/ccString.h"
-#include "ccWebsocketClient/ccEasyWebsocketClient.h"
+#include "ccWebServer/ccWebsocket.h"
 
 class FileSendingClient {
 public:
@@ -15,6 +15,7 @@ private:
                                 const std::string &message);
 
 private:
-  Luna::ccEasyWebsocketClient ws_client_;
+  //Luna::ccEasyWebsocketClient ws_client_;
+  std::shared_ptr<Luna::ccWebsocket> ws_client_;
   bool is_ws_closed_;
 };

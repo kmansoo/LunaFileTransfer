@@ -9,10 +9,20 @@
 #include "json/value.h"
 #include "json/writer.h"
 
+#include "ccWebServer/ccWebServerManager.h"
+#include "ccMongooseServer/ccMongooseWebServerObjectFactory.h"
+
 #include "FileSendingClient.h"
 
+#include "ccWebsocketClient/ccEasyWebsocketClient.h"
+
 FileSendingClient::FileSendingClient() : is_ws_closed_(true) {
-  ws_client_.set_event_listener(
+  Luna::ccWebServerManager::instance().attach_factory(std::make_shared<Luna::ccMongooseWebServerObjectFactory>());
+
+  // ws_client_ = Luna::ccWebServerManager::instance().create_websocket();
+  ws_client_ = std::make_shared<Luna::ccEasyWebsocketClient>();
+
+  ws_client_->set_event_listener(
       std::bind(&FileSendingClient::recv_data_from_websocket, this,
                 std::placeholders::_1, std::placeholders::_2));
 }
@@ -50,7 +60,7 @@ bool FileSendingClient::send(const std::string &url,
   Json::Value protocol_json;
   Json::StyledWriter json_writer;
 
-  if (ws_client_.open(url) == true) {
+  if (ws_client_->open(url) == true) {
     is_ws_closed_ = false;
 
     {
@@ -64,7 +74,7 @@ bool FileSendingClient::send(const std::string &url,
 
       protocol_json["info"] = info_json;
 
-      ws_client_.send(json_writer.write(protocol_json));
+	  ws_client_->send(json_writer.write(protocol_json));
     }
 
     int count_for_sleep = 0;
@@ -90,7 +100,7 @@ bool FileSendingClient::send(const std::string &url,
 
         protocol_json["chunk"] = encoded_data;
 
-        ws_client_.send(json_writer.write(protocol_json));
+		ws_client_->send(json_writer.write(protocol_json));
 
         if (count_for_sleep++ > 5) {
           count_for_sleep = 0;
@@ -103,15 +113,15 @@ bool FileSendingClient::send(const std::string &url,
         std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
         std::cout << sent_bytes << " / " << filesize << "(" << (float)sent_bytes / (float)filesize * 100.0f << "%)";
         
-        Luna::sleep(2);
+        Luna::sleep(1);
     }
 
     protocol_json.clear();
     protocol_json["type"] = "completed";
-    ws_client_.send(json_writer.write(protocol_json));
+	ws_client_->send(json_writer.write(protocol_json));
   }
 
-  ws_client_.close();
+  ws_client_->close();
 
   return false;
 }

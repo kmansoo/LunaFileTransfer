@@ -33,3 +33,5 @@
 .vscode/
 build/
 **/.DS_Store
+msvc/.vs/
+msvc/Debug/

@@ -11,7 +11,7 @@
 
 #include "FileSendingClient.h"
 
-FileSendingClient::FileSendingClient() {
+FileSendingClient::FileSendingClient() : is_ws_closed_(true) {
   ws_client_.set_event_listener(
       std::bind(&FileSendingClient::recv_data_from_websocket, this,
                 std::placeholders::_1, std::placeholders::_2));
@@ -51,6 +51,8 @@ bool FileSendingClient::send(const std::string &url,
   Json::StyledWriter json_writer;
 
   if (ws_client_.open(url) == true) {
+    is_ws_closed_ = false;
+
     {
       protocol_json.clear();
       Json::Value info_json;
@@ -66,15 +68,16 @@ bool FileSendingClient::send(const std::string &url,
     }
 
     int count_for_sleep = 0;
+    char buffer[2048];
+    std::streamsize sent_bytes = 0;
 
-    while (!myfile.eof()) {
-        size_t size = 1024;
-        char buffer[1024];
+    while (!myfile.eof() && is_ws_closed_ == false) {
+        size_t size = 2048;
 
         myfile.read(buffer, size);    
         std::streamsize read_bytes = myfile.gcount();
 
-        std::cout << "[FileSendingClient], read_bytes = " << read_bytes << std::endl;
+        // std::cout << "[FileSendingClient], read_bytes = " << read_bytes << std::endl;
 
         // make protocol to send to server
         std::string encoded_data;
@@ -92,8 +95,15 @@ bool FileSendingClient::send(const std::string &url,
         if (count_for_sleep++ > 5) {
           count_for_sleep = 0;
 
-          Luna::sleep(1);
+          // `Luna::sleep(5);
         }
+
+        sent_bytes += read_bytes;
+
+        std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+        std::cout << sent_bytes << " / " << filesize << "(" << (float)sent_bytes / (float)filesize * 100.0f << "%)";
+        
+        Luna::sleep(2);
     }
 
     protocol_json.clear();
@@ -116,6 +126,7 @@ void FileSendingClient::recv_data_from_websocket(
 
   case Luna::ccWebsocket::ccWebSocketEvent_Disconnected: {
     std::cout << "[FileSendingClient], Disconnected." << std::endl;
+    is_ws_closed_ = true;
   } break;
 
   case Luna::ccWebsocket::ccWebSocketEvent_ReceivedData: {

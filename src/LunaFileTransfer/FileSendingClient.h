@@ -16,4 +16,5 @@ private:
 
 private:
   Luna::ccEasyWebsocketClient ws_client_;
+  bool is_ws_closed_;
 };

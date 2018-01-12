@@ -114,10 +114,12 @@ bool FileSendingClient::send(const std::string &url,
 
     protocol_json.clear();
     protocol_json["type"] = "completed";
-	ws_client_->send(json_writer.write(protocol_json));
+	  ws_client_->send(json_writer.write(protocol_json));
   }
 
   ws_client_->close();
+
+  std::cout << std::endl << std::endl;
 
   return false;
 }

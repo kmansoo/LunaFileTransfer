@@ -71,12 +71,12 @@ bool FileSendingClient::send(const std::string &url,
 	  ws_client_->send(json_writer.write(protocol_json));
     }
 
-    int count_for_sleep = 0;
-    char buffer[2048];
+    char buffer[3100];
     std::streamsize sent_bytes = 0;
+    int back_space_count = 10;
 
     while (!myfile.eof() && is_ws_closed_ == false) {
-        size_t size = 2048;
+        size_t size = 3072;
 
         myfile.read(buffer, size);    
         std::streamsize read_bytes = myfile.gcount();
@@ -94,18 +94,20 @@ bool FileSendingClient::send(const std::string &url,
 
         protocol_json["chunk"] = encoded_data;
 
-		ws_client_->send(json_writer.write(protocol_json));
-
-        if (count_for_sleep++ > 5) {
-          count_for_sleep = 0;
-
-          //Luna::sleep(5);
-        }
+		    ws_client_->send(json_writer.write(protocol_json));
 
         sent_bytes += read_bytes;
 
-        std::cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
-        std::cout << sent_bytes << " / " << filesize << "(" << (float)sent_bytes / (float)filesize * 100.0f << "%)";
+        for (int count = 0; count < back_space_count; count++)
+          std::cout << "\b";
+
+        Luna::ccString output_msg;
+
+        Luna::ccString::format(output_msg, "%ld / %ld(%4.2f%%)", sent_bytes, filesize, (float)sent_bytes / (float)filesize * 100.0f);
+
+        back_space_count = output_msg.length() + 5;
+
+        std::cout << output_msg;
         
         Luna::sleep(3);
     }

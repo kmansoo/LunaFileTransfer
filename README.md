@@ -10,7 +10,8 @@ I'm going to implement a file transfer through a websocket. The websocket is sup
 ### Linux & OS X
 ```bash
 cd ~/LunaFileTransfer/dependency/Luna
-cd dependency
+git submodule init
+git submodule update
 mkdir build
 cd build
 cmake ..
@@ -21,6 +22,8 @@ make
 ### Linux & OS X
 ```bash
 cd ~/LunaFileTransfer
+git submodule init
+git submodule update
 mkdir build  
 cd build
 cmake ..

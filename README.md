@@ -1,5 +1,5 @@
 # LunaFileTransfer
-I'm going to implement a file transfer through a websocket. The websocket is supported by Luna that is my open project.
+I implemeted a file transfer through a websocket. The websocket is supported by Luna that is my open project.
 
 ## How to build
 ### step1. make dependency libraries
